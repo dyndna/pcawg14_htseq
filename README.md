@@ -1,5 +1,7 @@
 ## pcawg14_htseq
 
+[![Coverage Status](https://coveralls.io/repos/dyndna/pcawg14_htseq/badge.svg)](https://coveralls.io/r/dyndna/pcawg14_htseq)
+
 >PCAWG-14 HTSeq RNAseq analysis pipeline
 >v 0.9.2 | Passing; Unstable
 
