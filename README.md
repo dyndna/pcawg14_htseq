@@ -1,6 +1,6 @@
 ## pcawg14_htseq
 
-[![Version 0.9.4p1](https://img.shields.io/badge/version-0.9.4p1-brightgreen.svg)](https://github.com/dyndna/pcawg14_htseq) [![Status Stable](https://img.shields.io/badge/status-stable-brightgreen.svg)](https://github.com/dyndna/pcawg14_htseq) [![Docker v0.9.2](https://img.shields.io/badge/docker-dyndna/pcawg14_htseq:0.9.2-brightgreen.svg "docker pull dyndna/pcawg14_htseq:0.9.2")](https://registry.hub.docker.com/u/dyndna/pcawg14_htseq)
+[![Version 0.9.4p1](https://img.shields.io/badge/version-0.9.4p1-brightgreen.svg)](https://github.com/dyndna/pcawg14_htseq/releases/tag/0.9.4p1) [![Status Stable](https://img.shields.io/badge/status-stable-brightgreen.svg)](https://github.com/dyndna/pcawg14_htseq/releases/tag/0.9.4p1) [![Docker v0.9.2](https://img.shields.io/badge/docker-dyndna/pcawg14_htseq:0.9.2-brightgreen.svg "docker pull dyndna/pcawg14_htseq:0.9.2")](https://registry.hub.docker.com/u/dyndna/pcawg14_htseq)
 
 [//]: # (https://img.shields.io/badge/status-offline-red.svg)
 
@@ -85,6 +85,10 @@ Example:
 PS: It is possible to automate `docker run` command and I will update documentation later. For the time being, a crude appraoch is to have awk / perl or R wrapper to change variables related to individual bams, and subsequently pass it to `docker run` command.
 
     head -n2 <workdir>/info/pcawg_v2.0_rnaseq_cghub_summary.tsv | awk '{print $14,$16,$17}' FS='\t' OFS='\t'
+
+#### Acknowledgement:
+
+Morten Muhlig Nielsen, PhD & Prof. Jakob Skou Pederson, PhD  
 
 END
 
