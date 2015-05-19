@@ -48,7 +48,7 @@ Directory structure under work dir: `<basedir>/pcawg14_htseq/`
 
 *   Move or symlink your cghub download credential file at `<workdir>/info/cgkey`
 
-*   Use default GENCODE v19 GTF, *rnaseq.gc19_extNc.gtf* or move/symlink your GTF file at `<workdir>/info/htseq.gtf`
+*   Use default extended annotation GTF, *rnaseq.gc19_extNc.gtf* or move/symlink your GTF file at `<workdir>/info/htseq.gtf`
 
 ```
 cd <workdir>/info
@@ -57,7 +57,7 @@ mv rnaseq.gc19_extNc.gtf htseq.gtf
 md5sum htseq.gtf
 ```
 
-If you are using extended annotation GTF derived from https://www.synapse.org/#!Synapse:syn3606092, MD5 checksum for `htseq.gtf` must match *48245eeff794b9e686466a80e66905c9*
+If you are using default extended annotation GTF derived from https://www.synapse.org/#!Synapse:syn3606092, MD5 checksum for `htseq.gtf` must match *48245eeff794b9e686466a80e66905c9*
 
 bed to gtf conversion for syn3606092 file, *rnaseq.gc19_extNc.bed* was done as follows:
 
@@ -82,4 +82,9 @@ Example:
 
     docker run -d -v /data/vol1/pcawg14_htseq:$MYWORKDIR -e MYWORKDIR=$MYWORKDIR -w=$MYWORKDIR dyndna/pcawg14_htseq:0.9.2 /bin/bash -c "source ${MYWORKDIR}/set_env/bash_profile && source ${MYWORKDIR}/scripts/htseq_docker_run.sh "b227b026-ef3b-4194-b833-d6386e906587" "PCAWG.057da4ba-421e-4f39-afa8-c7de2ca665e2.TopHat2.v1.bam" "38c067f8289e9c0689fed2c54e9b569e" | tee -a ${MYWORKDIR}/logs/htseq_docker_brc.log"
 
+PS: It is possible to automate `docker run` command and I will update documentation later. For the time being, a crude appraoch is to have awk / perl or R wrapper to change variables related to individual bams, and subsequently pass it to `docker run` command.
+
+    head -n2 <workdir>/info/pcawg_v2.0_rnaseq_cghub_summary.tsv | awk '{print $14,$16,$17}' FS='\t' OFS='\t'
+
 END
+
