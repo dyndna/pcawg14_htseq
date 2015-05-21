@@ -1,6 +1,6 @@
 ## pcawg14_htseq
 
-[![Version 0.9.4p1](https://img.shields.io/badge/version-0.9.4p1-brightgreen.svg)](https://github.com/dyndna/pcawg14_htseq/releases/tag/0.9.4p1) [![Status Stable](https://img.shields.io/badge/status-stable-brightgreen.svg)](https://github.com/dyndna/pcawg14_htseq/releases/tag/0.9.4p1) [![Docker v0.9.2](https://img.shields.io/badge/docker-dyndna/pcawg14_htseq:0.9.2-brightgreen.svg "docker pull dyndna/pcawg14_htseq:0.9.2")](https://registry.hub.docker.com/u/dyndna/pcawg14_htseq)
+[![Version 0.9.4p4](https://img.shields.io/badge/version-0.9.4p4-brightgreen.svg)](https://github.com/dyndna/pcawg14_htseq/releases/tag/0.9.4p4) [![Status Stable](https://img.shields.io/badge/status-stable-brightgreen.svg)](https://github.com/dyndna/pcawg14_htseq/releases/tag/0.9.4p4) [![Docker v0.9.2](https://img.shields.io/badge/docker-dyndna/pcawg14_htseq:0.9.2-brightgreen.svg "docker pull dyndna/pcawg14_htseq:0.9.2")](https://registry.hub.docker.com/u/dyndna/pcawg14_htseq)
 
 [//]: # (https://img.shields.io/badge/status-offline-red.svg)
 
@@ -10,7 +10,7 @@ PCAWG-14 HTSeq RNAseq analysis pipeline
 
 #### Install and config docker
 
-To avoid running out of space on root drive, it is recommended to edit `/etc/sysconfig/docker` in CentOS or `/etc/default/docker` in Ubuntu, and set docker container PATH to large storage drive. It is also suggested to use local DNS instead of default Google DNS in docker config to avoid issues with downloading remote data. Sample docker configs are given within git repository (below) under `./docker` directory.
+To avoid running out of space on root drive, it is recommended to edit `/etc/sysconfig/docker` in CentOS or `/etc/default/docker` in Ubuntu, and set docker container PATH to large storage drive. It is also suggested to use local DNS instead of default Google DNS in docker config to avoid issues with downloading remote data. Sample docker configs are given within git repository (below) under `./info/docker_host_configs` directory.
 
 ```
 docker pull dyndna/pcawg14_htseq:0.9.2
@@ -25,9 +25,15 @@ This is a PATH within docker container and not necessarily should be present in 
 
 #### Set up base directory
 
-Go to host directory under which all data needs to be stored.
+Go to host directory under which all data needs to be stored. Please read WARNING note below. Ideally, base directory should be freshly created directory under a non-system storage or scratch drive.
 
     cd /data/vol1
+
+##### WARNING:
+
+Current docker version 1.6.0 continues to have inherent security weakness by not separating root privileges between host system and docker container(s). This will results in allowing docker container to gain root privileges for host system. You may add `-e USER=$USER -e USERID=$UID` in `docker run` argument at `./scripts/batchrun/docker_batchrun_all.txt` to disallow docker container to gain root privileges. If you do so, **DO NOT MOUNT** root block device or `\` or $HOME `/~` as base directory, and instead use separate drive or block device other than disk where host system is mounted. However, keep in mind that binding non-root UID will *recursively and irreversibly change owner permission* of all files and directories under base directory in host system. It goes without saying that **this can easily break your system, including lock you out of system if you mount system-level directories or entire user home directory as docker base directory.**
+
+docker works best if used with care! More on security issues and how to minimize vulnerabilities: https://docs.docker.com/articles/security
 
 #### Set up work dir
 
@@ -42,7 +48,7 @@ ls
 
 Directory structure under work dir: `<basedir>/pcawg14_htseq/`
 
->info  LICENSE  README.md  scripts  set_env
+>info  LICENSE  README.md  sample_batchscript.sh  scripts  set_env
 
 ##### Required edits in workdir
 
@@ -74,6 +80,8 @@ Ref.: http://onetipperday.blogspot.com/2012/08/convert-bed-to-gtf.html
 
 #### docker command:
 
+##### Single sample run:
+
 Using bam file related attributes from downloaded cghub summary file, run docker command as follows:
 
 >docker run -d -v ***basedir***/pcawg14_htseq:$MYWORKDIR -e MYWORKDIR=$MYWORKDIR -w=$MYWORKDIR dyndna/pcawg14_htseq:0.9.2 /bin/bash -c "source ${MYWORKDIR}/set_env/bash_profile && source ${MYWORKDIR}/scripts/htseq_docker_run.sh ***"analysis_id" "filename" "checksum"*** | tee -a ${MYWORKDIR}/logs/htseq_docker_brc.log"
@@ -82,9 +90,24 @@ Example:
 
     docker run -d -v /data/vol1/pcawg14_htseq:$MYWORKDIR -e MYWORKDIR=$MYWORKDIR -w=$MYWORKDIR dyndna/pcawg14_htseq:0.9.2 /bin/bash -c "source ${MYWORKDIR}/set_env/bash_profile && source ${MYWORKDIR}/scripts/htseq_docker_run.sh "b227b026-ef3b-4194-b833-d6386e906587" "PCAWG.057da4ba-421e-4f39-afa8-c7de2ca665e2.TopHat2.v1.bam" "38c067f8289e9c0689fed2c54e9b569e" | tee -a ${MYWORKDIR}/logs/htseq_docker_brc.log"
 
-PS: It is possible to automate `docker run` command and I will update documentation later. For the time being, a crude appraoch is to have awk / perl or R wrapper to change variables related to individual bams, and subsequently pass it to `docker run` command.
+##### Batch run:
 
-    head -n2 <workdir>/info/pcawg_v2.0_rnaseq_cghub_summary.tsv | awk '{print $14,$16,$17}' FS='\t' OFS='\t'
+First, make format for `docker run` command as per `./scripts/batchrun/docker_batchrun_all.txt` using R script, `./scripts/batchrun/pcawg14_htseq_docker_batchrun.Rmd`
+
+Then, go to workdir and execute following command to run sample 1 to 100.
+
+    cd <workdir>
+    ./scripts/batchrun/batchrun_docker.sh 1 100 ./scripts/batchrun/docker_batchrun_all.txt > ./logs/batch_1_100.log 2>&1 &
+
+You can do pseudo parallelization by executing above script after fixed wait time, e.g., after 1 hour or so for allowing preceding sample to be downloaded and name sorted. Here is an example batch script to run three samples in parallel and process upto 300 samples. Please check `./sample_batchscript.sh` to confirm/edit your workdir. You may use GNU Screen or `nohup` command to keep script alive after exiting terminal session. 
+
+    ./sample_batchscript.sh | tee -a logs/brc1_batchscripts_11_300.log
+
+#### logging:
+
+Although not clean, this pipeline will keep master log in `./logs/htseq_docker_brc.log` and individual batch run summary under `./logs/batch_*.log`
+
+To know how many samples have been processed successfully, run `ls ./processed/*.gto | wc -l`.
 
 #### Acknowledgement:
 
