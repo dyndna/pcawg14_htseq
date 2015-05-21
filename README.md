@@ -1,14 +1,21 @@
-## pcawg14_htseq
+### PCAWG-14 HTSeq RNAseq analysis pipeline
 
-[![Version 0.9.4p4](https://img.shields.io/badge/version-0.9.4p4-brightgreen.svg)](https://github.com/dyndna/pcawg14_htseq/releases/tag/0.9.4p4) [![Status Stable](https://img.shields.io/badge/status-stable-brightgreen.svg)](https://github.com/dyndna/pcawg14_htseq/releases/tag/0.9.4p4) [![Docker v0.9.2](https://img.shields.io/badge/docker-dyndna/pcawg14_htseq:0.9.2-brightgreen.svg "docker pull dyndna/pcawg14_htseq:0.9.2")](https://registry.hub.docker.com/u/dyndna/pcawg14_htseq)
+[![Version 0.9.4p4](https://img.shields.io/badge/version-0.9.4p4-brightgreen.svg)](https://github.com/dyndna/pcawg14_htseq/releases/tag/0.9.4p4) [![Status Stable](https://img.shields.io/badge/status-stable-brightgreen.svg)](https://github.com/dyndna/pcawg14_htseq/releases/tag/0.9.4p4) [![Dockerfile](https://img.shields.io/badge/Dockerfile-v0.9.2-brightgreen.svg "Build Instructions")](https://registry.hub.docker.com/u/dyndna/docker-for-pcawg14-htseq/dockerfile/) [![Docker v0.9.2](https://img.shields.io/badge/docker-dyndna/pcawg14_htseq:0.9.2-brightgreen.svg "docker pull dyndna/pcawg14_htseq:0.9.2")](https://registry.hub.docker.com/u/dyndna/pcawg14_htseq)
 
 [//]: # (https://img.shields.io/badge/status-offline-red.svg)
 
-PCAWG-14 HTSeq RNAseq analysis pipeline
+#### Acknowledgement:
 
-### In host OS:
+*   Morten Muhlig Nielsen, PhD & Prof. Jakob Skou Pederson, PhD
+*   [Laurent Jourdren](https://github.com/jourdren), Genomic Paris Centre
+*   [André Kahles](https://github.com/akahles), PhD  
+*   [Nuno Fonseca](https://github.com/nunofonseca), PhD   
 
-#### Install and config docker
+***
+
+### <span class="octicon octicon-tools"></span> Required configurations host unix system:
+
+#### <span class="octicon octicon-repo-pull"></span> Install and config docker
 
 To avoid running out of space on root drive, it is recommended to edit `/etc/sysconfig/docker` in CentOS or `/etc/default/docker` in Ubuntu, and set docker container PATH to large storage drive. It is also suggested to use local DNS instead of default Google DNS in docker config to avoid issues with downloading remote data. Sample docker configs are given within git repository (below) under `./info/docker_host_configs` directory.
 
@@ -16,6 +23,10 @@ To avoid running out of space on root drive, it is recommended to edit `/etc/sys
 docker pull dyndna/pcawg14_htseq:0.9.2
 docker images
 ```
+
+If downloaded docker image has name other than *dyndna/pcawg14_htseq:0.9.2*, rename or create alias image as follows:
+
+    docker tag <IMAGE ID> dyndna/pcawg14_htseq:0.9.2
 
 #### Set *MYWORKDIR* variable
 
@@ -29,13 +40,17 @@ Go to host directory under which all data needs to be stored. Please read WARNIN
 
     cd /data/vol1
 
-##### WARNING:
+##### <span class="octicon octicon-alert"></span> WARNING <span class="octicon octicon-stop"></span>
 
-Current docker version 1.6.0 continues to have inherent security weakness by not separating root privileges between host system and docker container(s). This will results in allowing docker container to gain root privileges for host system. You may add `-e USER=$USER -e USERID=$UID` in `docker run` argument at `./scripts/batchrun/docker_batchrun_all.txt` to disallow docker container to gain root privileges. If you do so, **DO NOT MOUNT** root block device or `\` or $HOME `/~` as base directory, and instead use separate drive or block device other than disk where host system is mounted. However, keep in mind that binding non-root UID will *recursively and irreversibly change owner permission* of all files and directories under base directory in host system. It goes without saying that **this can easily break your system, including lock you out of system if you mount system-level directories or entire user home directory as docker base directory.**
+Current docker version 1.6.0 continues to have inherent security weakness by not separating root privileges between host system and docker container(s). This will results in allowing docker container to gain root privileges for host system. You may force ownership to some dummy user, *foo* by passing `-e USER=$USER -e USERID=$UID` variables in `docker run` argument at `./scripts/batchrun/docker_batchrun_all.txt`, and thus disallow docker container to gain root privileges. If you do so or in any other case, **PLEASE DO NOT MOUNT** root block device or `\` or $HOME `/~` as base directory, and instead use separate drive or block device other than disk where host system is mounted. However, keep in mind that binding non-root UID will *recursively and irreversibly change owner permission* of all files and directories under base directory in host system. It goes without saying that **this can easily break your system, including lock you out of system if you mount system-level directories or entire user home directory as docker base directory.**
 
 docker works best if used with care! More on security issues and how to minimize vulnerabilities: https://docs.docker.com/articles/security
 
-#### Set up work dir
+Dockerfile for image, *dyndna/pcawg14_htseq:0.9.2* can be seen at https://registry.hub.docker.com/u/dyndna/docker-for-pcawg14-htseq/dockerfile/ If you build *dyndna/pcawg14_htseq:0.9.2* from source, image may have different name. If so, rename it as follows:
+
+    docker tag <IMAGE ID> dyndna/pcawg14_htseq:0.9.2
+
+#### <span class="octicon octicon-file-directory"></span> Set up work dir
 
 Your work dir will be mounted as `/scratch` in docker container. Configure work directory as follows without changing any dir/file names:
 
@@ -80,7 +95,7 @@ Ref.: http://onetipperday.blogspot.com/2012/08/convert-bed-to-gtf.html
 
 #### docker command:
 
-##### Single sample run:
+##### <span class="octicon octicon-playback-play"></span> Single sample run:
 
 Using bam file related attributes from downloaded cghub summary file, run docker command as follows:
 
@@ -90,7 +105,7 @@ Example:
 
     docker run -d -v /data/vol1/pcawg14_htseq:$MYWORKDIR -e MYWORKDIR=$MYWORKDIR -w=$MYWORKDIR dyndna/pcawg14_htseq:0.9.2 /bin/bash -c "source ${MYWORKDIR}/set_env/bash_profile && source ${MYWORKDIR}/scripts/htseq_docker_run.sh "b227b026-ef3b-4194-b833-d6386e906587" "PCAWG.057da4ba-421e-4f39-afa8-c7de2ca665e2.TopHat2.v1.bam" "38c067f8289e9c0689fed2c54e9b569e" | tee -a ${MYWORKDIR}/logs/htseq_docker_brc.log"
 
-##### Batch run:
+##### <span class="octicon octicon-playback-fast-forward"></span> Batch run:
 
 First, make format for `docker run` command as per `./scripts/batchrun/docker_batchrun_all.txt` using R script, `./scripts/batchrun/pcawg14_htseq_docker_batchrun.Rmd`
 
@@ -108,10 +123,6 @@ You can do pseudo parallelization by executing above script after fixed wait tim
 Although not clean, this pipeline will keep master log in `./logs/htseq_docker_brc.log` and individual batch run summary under `./logs/batch_*.log`
 
 To know how many samples have been processed successfully, run `ls ./processed/*.gto | wc -l`.
-
-#### Acknowledgement:
-
-Morten Muhlig Nielsen, PhD & Prof. Jakob Skou Pederson, PhD  
 
 END
 
