@@ -68,7 +68,7 @@ pcawg14_htseq <-function(fqs, sample_name, dataurl,
 											my_sort_nt, my_sort_mem,
 											sample_name, fqs, sample_name, basename(file_path_sans_ext(as.character(fqs)))) 
 
-	cmd_count <- sprintf("samtools view -F 4 %s/%s.sorted.bam | htseq-count -m intersection-nonempty --stranded=no --idattr gene_id -r name - %s > %s_%s_%s.htseq.cnt", 
+	cmd_count <- sprintf("samtools view -F 4 %s/%s.sorted.bam | htseq-count -m intersection-nonempty --stranded=no --idattr gene_id -r name - %s > %s/%s_%s.htseq.cnt", 
 											sample_name, basename(file_path_sans_ext(as.character(fqs))),
 											my_gtf,
 											sample_name, basename(file_path_sans_ext(as.character(fqs))), time_tag)
