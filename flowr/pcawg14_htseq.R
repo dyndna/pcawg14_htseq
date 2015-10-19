@@ -17,7 +17,7 @@ if(FALSE)
 
 ## create a flow object
 get_flow <- function(s, out, myflowname, myoutdir){
-	sampout = subset(out, samplename == s & read == 1)
+	sampout = subset(out, samplename == s)
 	fqs = sampout$file
 	dataurl = sampout$url
 	sample_name = s
