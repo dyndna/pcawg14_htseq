@@ -73,9 +73,14 @@ pcawg14_htseq <-function(fqs, sample_name, dataurl,
 											my_gtf,
 											sample_name, basename(file_path_sans_ext(as.character(fqs))), time_tag)
 
+	cmd_wipe <- sprintf("rm -f %s/%s.sorted.bam %s/%s", 
+											sample_name, basename(file_path_sans_ext(as.character(fqs))),
+											sample_name, fqs)
+
 	cmd.list = list(download = cmd_download, 
 									sort = cmd_sort,
-									count = cmd_count)
+									count = cmd_count,
+									wipe = cmd_wipe)
 	
 	my.flowmat <- to_flowmat(x = cmd.list, samplename = sample_name)
 	return(my.flowmat)

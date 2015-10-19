@@ -2,3 +2,4 @@ jobname,sub_type,prev_jobs,dep_type,queue,memory_reserved,walltime,cpu_reserved,
 download,serial,none,none,transfer,16384,1:00,6,lsf,1
 sort,serial,download,serial,medium,16384,4:00,8,lsf,2
 count,serial,sort,serial,medium,16384,04:00,3,lsf,3
+wipe,serial,count,serial,short,16384,01:00,2,lsf,4
