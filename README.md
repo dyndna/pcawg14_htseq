@@ -11,7 +11,7 @@ Primary version is [dockerized](https://hub.docker.com/r/dyndna/pcawg14_htseq) a
 ***
 
 Pipeline is made possible by   
-[![docs.flowr.space](https://raw.githubusercontent.com/sahilseth/flowr/devel/vignettes/files/logo.png) Streamlining Computing workflows, author:[sahilseth](https://github.com/sahilseth)
+![docs.flowr.space](https://raw.githubusercontent.com/sahilseth/flowr/devel/vignettes/files/logo.png) Streamlining Computing workflows, author:[sahilseth](https://github.com/sahilseth)
 
 
 END
