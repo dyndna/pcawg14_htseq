@@ -1,0 +1,38 @@
+#PBS -l nodes=1:ppn=6,walltime=8:00:00
+#PBS -l	mem=12gb
+#PBS -M samin11@mdanderson.org
+#PBS -m ae
+#PBS -d	/scratch/genomic_med/gm_dep/samin1/orion/workdirs/pcawg14
+#PBS -o /scratch/genomic_med/gm_dep/samin1/orion/logs/qsub
+#PBS -e /scratch/genomic_med/gm_dep/samin1/orion/logs/qsub
+#PBS -V
+
+## PBS wrapper:
+# v 2.0.1 | 10-15 | @sbamin
+#Usgae: msub -vARG1=<INTEGER>,ARG2=<INTEGER>,ARG3=<STRING> htseq_nautilus_batchrun.pbs
+
+#Example:
+#msub -vARG1=1,ARG2=4,ARG3=pcawg14 htseq_nautilus_batchrun.pbs
+##########
+
+#cd to working directory, from where qsub was executed.
+#cd ${PBS_O_WORKDIR}
+
+#load modules: 
+#CAUTION: Following does not seem to work. MANUALLY LOAD module before executing qsub.
+#module load R/R-3.0.2
+
+#Run pre-script qsub stats:
+#source /RIS/home/samin11/bin/qsub_stats.sh | tee -a /RIS/scratch/samin11/dump/cuff_${ARG1}_${ARG2}_err.log
+#sleep 2
+
+#Run analysis scripts:
+echo	"My	job	ran	on:"			
+cat	$PBS_NODEFILE
+
+Rscript /scratch/genomic_med/gm_dep/samin1/orion/scripts/pcawg14/htseq_nautilus_batchrun.R $ARG1 $ARG2 $ARG3 2>&1 | tee -a ~/orion/logs/${ARG3}_${ARG1}_${ARG2}.log
+
+echo "====== msub job done $(date) ======" | tee -a ~/orion/logs/${ARG3}_${ARG1}_${ARG2}.log
+echo "====================== PBS SCRIPT EXECUTION COMPLETED =========================================" | tee -a ~/orion/logs/${ARG3}_${ARG1}_${ARG2}.log
+
+#END
