@@ -47,7 +47,7 @@
 
 ########## USER EDITABLE CONTENTS ##########
 ## fqdir is path to master data.frame in R rds which contains data in character mode with at least following colnames: samplename, analysis_id, file, and url. samplename and analysis ids must be unique across all libraries (column), but can be identical for an individual library(row).
-	fqdir = "../master/pilot3_ebi.rds"
+	fqdir = "../master/nonebi_pending.rds"
 	if(!file.exists(fqdir))
 		stop(sprintf("master table was not found at %s", fqdir))
 ######## END USER EDITABLE CONTENTS ########
